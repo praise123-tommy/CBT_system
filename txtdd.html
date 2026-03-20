@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annex Test System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#16a34a', primaryDark: '#15803d' }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { margin: 0; overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0fdf4; }
+        /* Canvas Background */
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; opacity: 0.4; }
+        /* Loader Canvas */
+        #loader-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #ffffff; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s ease; }
+        .view-section { display: none; animation: fadeIn 0.4s ease-in; min-height: 80vh; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .btn-green { background-color: #16a34a; color: white; transition: all 0.3s; }
+        .btn-green:hover { background-color: #15803d; color: white; transform: scale(1.02); }
+        .loader-spinner { border: 4px solid #f3f3f3; border-top: 4px solid #16a34a; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div id="loader-container">
+        <canvas id="loader-canvas" width="200" height="200"></canvas>
+        <h2 class="text-primary mt-4 font-bold text-2xl tracking-widest">ANNEX SYSTEM</h2>
+    </div>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center cursor-pointer" onclick="navigate('landing')">
+                    <div class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold text-xl mr-2">A</div>
+                    <span class="font-bold text-xl text-primary">Annex Test System</span>
+                </div>
+                <div class="flex items-center space-x-4" id="nav-links">
+                    </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <div id="view-landing" class="view-section active">
+            <div id="heroCarousel" class="carousel slide mb-12 shadow-lg rounded-xl overflow-hidden" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active bg-primary text-white p-20 text-center">
+                        <h1 class="text-4xl font-bold mb-4">Welcome to Annex Test System</h1>
+                        <p class="text-xl">Empowering students with real-time, online CBT testing.</p>
+                    </div>
+                    <div class="carousel-item bg-white text-primary p-20 text-center border-4 border-primary">
+                        <h1 class="text-4xl font-bold mb-4">Science & Arts Modules</h1>
+                        <p class="text-xl">Test your knowledge across multiple disciplines with live API questions.</p>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-primary">
+                    <h3 class="text-2xl font-bold text-primary mb-2">About Us</h3>
+                    <p>Annex simulates real-world CBT environments by pulling fresh, live questions from the Open Trivia Database instantly.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-primary">
+                    <h3 class="text-2xl font-bold text-primary mb-2">Features</h3>
+                    <ul class="list-disc pl-5">
+                        <li>Live Internet Question Fetching</li>
+                        <li>Instant Scoring & Analytics</li>
+                        <li>Secure Local Storage</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button onclick="navigate('signup')" class="btn-green px-8 py-3 rounded-full text-lg font-bold shadow-lg mx-2">Sign Up Now</button>
+                <button onclick="navigate('login')" class="bg-white border-2 border-primary text-primary px-8 py-3 rounded-full text-lg font-bold shadow-lg mx-2 hover:bg-green-50">Login</button>
+            </div>
+        </div>
+
+        <div id="view-signup" class="view-section">
+            <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg border-t-4 border-primary">
+                <h2 class="text-3xl font-bold text-center text-primary mb-6">Create Account</h2>
+                <form id="signup-form" onsubmit="handleSignup(event)">
+                    <input type="text" id="su-name" placeholder="Full Name" required class="w-full mb-4 px-4 py-2 border rounded focus:outline-none focus:border-primary">
+                    <input type="email" id="su-email" placeholder="Email Address" required class="w-full mb-4 px-4 py-2 border rounded focus:outline-none focus:border-primary">
+                    <input type="number" id="su-age" placeholder="Age" required class="w-full mb-4 px-4 py-2 border rounded focus:outline-none focus:border-primary">
+                    <input type="password" id="su-pass" placeholder="Password" required class="w-full mb-4 px-4 py-2 border rounded focus:outline-none focus:border-primary">
+                    <input type="password" id="su-confirm" placeholder="Confirm Password" required class="w-full mb-6 px-4 py-2 border rounded focus:outline-none focus:border-primary">
+                    <button type="submit" class="w-full btn-green py-2 rounded font-bold">Register</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="view-login" class="view-section">
+            <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg border-t-4 border-primary">
+                <h2 class="text-3xl font-bold text-center text-primary mb-6">User Login</h2>
+                <form id="login-form" onsubmit="handleLogin(event)">
+                    <input type="email" id="li-email" placeholder="Email Address" required class="w-full mb-4 px-4 py-2 border rounded focus:outline-none focus:border-primary">
+                    <input type="password" id="li-pass" placeholder="Password" required class="w-full mb-6 px-4 py-2 border rounded focus:outline-none focus:border-primary">
+                    <button type="submit" class="w-full btn-green py-2 rounded font-bold">Login</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="view-dashboard" class="view-section">
+            <div class="bg-white p-8 rounded-xl shadow-lg mb-8">
+                <h2 class="text-3xl font-bold text-primary mb-4" id="dash-welcome">Welcome</h2>
+                <div class="grid grid-cols-2 gap-4 text-lg">
+                    <p><strong>Email:</strong> <span id="dash-email"></span></p>
+                    <p><strong>Age:</strong> <span id="dash-age"></span></p>
+                    <p><strong>Tests Taken:</strong> <span id="dash-tests-count">0</span></p>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-bold text-primary">Your Courses & Tests</h3>
+                <button onclick="navigate('register-course')" class="btn-green px-4 py-2 rounded">Register New Course</button>
+            </div>
+            
+            <div id="dash-courses" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                </div>
+        </div>
+
+        <div id="view-register-course" class="view-section">
+            <h2 class="text-3xl font-bold text-primary mb-6 text-center">Register Courses</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded shadow">
+                    <h3 class="font-bold text-xl text-green-700 mb-4">Science</h3>
+                    <div id="course-list-science" class="space-y-2"></div>
+                </div>
+                <div class="bg-white p-6 rounded shadow">
+                    <h3 class="font-bold text-xl text-green-700 mb-4">Art</h3>
+                    <div id="course-list-art" class="space-y-2"></div>
+                </div>
+            </div>
+            <div class="mt-8 text-center">
+                <button onclick="saveCourses()" class="btn-green px-8 py-3 rounded font-bold">Save Registered Courses</button>
+            </div>
+        </div>
+
+        <div id="view-cbt" class="view-section">
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <div class="flex justify-between items-center border-b pb-4 mb-4">
+                    <h2 class="text-2xl font-bold text-primary" id="cbt-title">Test</h2>
+                    <div class="text-xl font-mono bg-green-100 text-green-800 px-4 py-1 rounded" id="q-counter">Q: <span id="cbt-q-num">1</span>/10</div>
+                </div>
+                
+                <div id="cbt-loading-indicator" class="text-center py-8 hidden">
+                    <div class="loader-spinner mb-4"></div>
+                    <p class="text-lg text-primary font-bold">Fetching live questions from the database...</p>
+                </div>
+
+                <div id="cbt-question-container" class="mb-8 min-h-[150px]">
+                    <h3 class="text-xl mb-4 font-semibold" id="cbt-question-text"></h3>
+                    <div id="cbt-options" class="space-y-3">
+                        </div>
+                </div>
+
+                <div class="flex justify-between" id="cbt-controls">
+                    <button onclick="endTestEarly()" class="text-red-500 hover:underline">End Test Early</button>
+                    <button onclick="nextQuestion()" class="btn-green px-6 py-2 rounded" id="btn-next-q">Next Question</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-score" class="view-section text-center">
+            <div class="bg-white p-12 rounded-xl shadow-lg max-w-2xl mx-auto border-t-8 border-primary">
+                <h2 class="text-4xl font-bold text-primary mb-4">Test Completed!</h2>
+                <p class="text-xl mb-2">Subject: <strong id="score-subject"></strong></p>
+                <div class="my-8">
+                    <span class="text-6xl font-bold" id="score-value">0</span><span class="text-3xl text-gray-400">/10</span>
+                </div>
+                <p class="mb-8 text-gray-600" id="score-message"></p>
+                <button onclick="navigate('dashboard')" class="btn-green px-8 py-3 rounded-full font-bold">Return to Dashboard</button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-white border-t mt-12 py-6 text-center text-gray-500">
+        <p>&copy; 2026 Annex Test System. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // --- 1. DATA & STATE MANAGEMENT ---
+        let users = JSON.parse(localStorage.getItem('annex_users')) || [];
+        let currentUserEmail = localStorage.getItem('annex_currentUser');
+        let currentUser = users.find(u => u.email === currentUserEmail) || null;
+
+        const availableCourses = {
+            Science: ['Mathematics', 'English Language', 'Biology', 'Physics', 'Chemistry'],
+            Art: ['Literature', 'English Language', 'Mathematics', 'Theatre Art', 'Music']
+        };
+
+        let currentTestState = { subject: '', questions: [], currentIndex: 0, score: 0 };
+
+        // OpenTDB Category Mapping
+        const apiCategories = {
+            'Mathematics': 19, 'Biology': 17, 'Physics': 17, 'Chemistry': 17,
+            'Literature': 10, 'English Language': 10, 'Theatre Art': 13, 'Music': 12
+        };
+
+        // Utility to fix HTML character encoding issues from the API
+        function decodeHTML(html) {
+            const txt = document.createElement("textarea");
+            txt.innerHTML = html;
+            return txt.value;
+        }
+
+        // --- 2. API FETCHING & FALLBACK ---
+        async function fetchQuestionsFromAPI(subject) {
+            const categoryId = apiCategories[subject] || 9; // 9 is General Knowledge fallback
+            const url = `https://opentdb.com/api.php?amount=10&category=${categoryId}&type=multiple`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.response_code === 0 && data.results.length > 0) {
+                    return data.results.map(item => {
+                        const correctAns = decodeHTML(item.correct_answer);
+                        const allOpts = item.incorrect_answers.map(decodeHTML);
+                        
+                        // Insert correct answer randomly
+                        const insertIndex = Math.floor(Math.random() * (allOpts.length + 1));
+                        allOpts.splice(insertIndex, 0, correctAns);
+
+                        return {
+                            q: decodeHTML(item.question),
+                            opts: allOpts,
+                            ans: insertIndex
+                        };
+                    });
+                } else {
+                    throw new Error("API returned no results");
+                }
+            } catch (error) {
+                console.warn("Live API failed, using fallback mock generator.", error);
+                return generateMockFallback(subject);
+            }
+        }
+
+        function generateMockFallback(subject) {
+            const qBank = [];
+            for(let i=1; i<=15; i++) {
+                qBank.push({
+                    q: `[Offline Mode] Auto-generated ${subject} question #${i}?`,
+                    opts: [`Option A`, `Option B`, `Option C`, `Option D`],
+                    ans: Math.floor(Math.random() * 4)
+                });
+            }
+            return qBank.sort(() => 0.5 - Math.random()).slice(0, 10);
+        }
+
+        // --- 3. CANVAS ANIMATIONS ---
+        function initCanvasAnimations() {
+            const loaderCanvas = document.getElementById('loader-canvas');
+            const lCtx = loaderCanvas.getContext('2d');
+            let angle = 0;
+            
+            function drawLoader() {
+                lCtx.clearRect(0, 0, 200, 200);
+                lCtx.beginPath();
+                lCtx.arc(100, 100, 40, angle, angle + Math.PI);
+                lCtx.strokeStyle = '#16a34a'; lCtx.lineWidth = 8; lCtx.stroke();
+                lCtx.beginPath();
+                lCtx.arc(100, 100, 60, -angle, -angle + Math.PI);
+                lCtx.strokeStyle = '#e5e7eb'; lCtx.lineWidth = 4; lCtx.stroke();
+                
+                angle += 0.1;
+                if(document.getElementById('loader-container').style.display !== 'none') {
+                    requestAnimationFrame(drawLoader);
+                }
+            }
+            drawLoader();
+
+            const bgCanvas = document.getElementById('bg-canvas');
+            const bgCtx = bgCanvas.getContext('2d');
+            let particles = [];
+            
+            function resize() { bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight; }
+            window.addEventListener('resize', resize);
+            resize();
+
+            for(let i=0; i<50; i++) {
+                particles.push({
+                    x: Math.random() * bgCanvas.width, y: Math.random() * bgCanvas.height,
+                    vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5,
+                    size: Math.random() * 3 + 1
+                });
+            }
+
+            function drawBg() {
+                bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+                bgCtx.fillStyle = '#16a34a';
+                particles.forEach(p => {
+                    p.x += p.vx; p.y += p.vy;
+                    if(p.x < 0 || p.x > bgCanvas.width) p.vx *= -1;
+                    if(p.y < 0 || p.y > bgCanvas.height) p.vy *= -1;
+                    bgCtx.beginPath(); bgCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2); bgCtx.fill();
+                });
+                requestAnimationFrame(drawBg);
+            }
+            drawBg();
+
+            setTimeout(() => {
+                const loader = document.getElementById('loader-container');
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+            }, 1500);
+        }
+
+        // --- 4. NAVIGATION & UI LOGIC ---
+        function navigate(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(`view-${viewId}`).classList.add('active');
+            updateNavbar();
+            if(viewId === 'dashboard') loadDashboard();
+            if(viewId === 'register-course') loadCourseRegistration();
+        }
+
+        function updateNavbar() {
+            const navLinks = document.getElementById('nav-links');
+            if (currentUser) {
+                navLinks.innerHTML = `<button onclick="navigate('dashboard')" class="text-gray-600 hover:text-primary font-semibold mr-4">Dashboard</button><button onclick="logout()" class="text-red-500 hover:text-red-700 font-semibold">Logout</button>`;
+            } else {
+                navLinks.innerHTML = `<button onclick="navigate('login')" class="text-gray-600 hover:text-primary font-semibold mr-4">Login</button><button onclick="navigate('signup')" class="bg-primary text-white px-4 py-2 rounded-full font-bold hover:bg-primaryDark">Sign Up</button>`;
+            }
+        }
+
+        // --- 5. AUTHENTICATION ---
+        function handleSignup(e) {
+            e.preventDefault();
+            const name = document.getElementById('su-name').value;
+            const email = document.getElementById('su-email').value;
+            const age = document.getElementById('su-age').value;
+            const pass = document.getElementById('su-pass').value;
+            const conf = document.getElementById('su-confirm').value;
+
+            if (pass !== conf) return alert("Passwords do not match!");
+            if (users.find(u => u.email === email)) return alert("Email already registered!");
+
+            users.push({ name, email, age, password: pass, courses: [], testHistory: [] });
+            localStorage.setItem('annex_users', JSON.stringify(users));
+            alert("Registration successful! Please login."); navigate('login');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('li-email').value;
+            const pass = document.getElementById('li-pass').value;
+            const user = users.find(u => u.email === email && u.password === pass);
+            
+            if (user) { currentUser = user; localStorage.setItem('annex_currentUser', email); navigate('dashboard'); } 
+            else { alert("Invalid email or password."); }
+        }
+
+        function logout() { currentUser = null; localStorage.removeItem('annex_currentUser'); navigate('landing'); }
+
+        // --- 6. DASHBOARD & COURSES ---
+        function loadDashboard() {
+            if(!currentUser) return navigate('login');
+            document.getElementById('dash-welcome').innerText = `Welcome, ${currentUser.name}`;
+            document.getElementById('dash-email').innerText = currentUser.email;
+            document.getElementById('dash-age').innerText = currentUser.age;
+            document.getElementById('dash-tests-count').innerText = currentUser.testHistory.length;
+
+            const coursesContainer = document.getElementById('dash-courses');
+            coursesContainer.innerHTML = '';
+
+            if (currentUser.courses.length === 0) {
+                coursesContainer.innerHTML = '<p class="text-gray-500 italic col-span-3">No courses registered yet.</p>';
+            } else {
+                currentUser.courses.forEach(course => {
+                    const history = currentUser.testHistory.filter(t => t.subject === course);
+                    const bestScore = history.length > 0 ? Math.max(...history.map(t => t.score)) : 'N/A';
+                    coursesContainer.innerHTML += `
+                        <div class="border rounded-lg p-4 shadow-sm hover:shadow-md transition bg-white border-l-4 border-l-primary">
+                            <h4 class="font-bold text-lg text-gray-800">${course}</h4>
+                            <p class="text-sm text-gray-500 mb-4">Best Score: ${bestScore !== 'N/A' ? bestScore+'/10' : 'Not taken'}</p>
+                            <button onclick="startTest('${course}')" class="w-full bg-green-100 text-green-800 py-2 rounded font-semibold hover:bg-primary hover:text-white transition">Take CBT Test</button>
+                        </div>`;
+                });
+            }
+        }
+
+        function loadCourseRegistration() {
+            const sciContainer = document.getElementById('course-list-science');
+            const artContainer = document.getElementById('course-list-art');
+            sciContainer.innerHTML = ''; artContainer.innerHTML = '';
+
+            const renderCheckbox = (course, container) => {
+                const checked = currentUser.courses.includes(course) ? 'checked' : '';
+                container.innerHTML += `<label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-green-50"><input type="checkbox" value="${course}" class="course-checkbox form-checkbox h-5 w-5 text-primary" ${checked}><span>${course}</span></label>`;
+            };
+
+            availableCourses.Science.forEach(c => renderCheckbox(c, sciContainer));
+            availableCourses.Art.forEach(c => renderCheckbox(c, artContainer));
+        }
+
+        function saveCourses() {
+            const checkboxes = document.querySelectorAll('.course-checkbox:checked');
+            currentUser.courses = Array.from(checkboxes).map(cb => cb.value);
+            const userIndex = users.findIndex(u => u.email === currentUser.email);
+            users[userIndex] = currentUser;
+            localStorage.setItem('annex_users', JSON.stringify(users));
+            alert("Courses updated successfully!"); navigate('dashboard');
+        }
+
+        // --- 7. CBT TEST ENGINE ---
+        async function startTest(subject) {
+            navigate('cbt');
+            document.getElementById('cbt-title').innerText = `${subject} CBT`;
+            
+            // Show Loader, Hide Controls/Questions
+            document.getElementById('cbt-loading-indicator').classList.remove('hidden');
+            document.getElementById('cbt-question-container').classList.add('hidden');
+            document.getElementById('cbt-controls').classList.add('hidden');
+            document.getElementById('q-counter').classList.add('hidden');
+
+            const liveQuestions = await fetchQuestionsFromAPI(subject);
+
+            currentTestState = { subject: subject, questions: liveQuestions, currentIndex: 0, score: 0 };
+            
+            // Hide Loader, Show Controls/Questions
+            document.getElementById('cbt-loading-indicator').classList.add('hidden');
+            document.getElementById('cbt-question-container').classList.remove('hidden');
+            document.getElementById('cbt-controls').classList.remove('hidden');
+            document.getElementById('q-counter').classList.remove('hidden');
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = currentTestState.questions[currentTestState.currentIndex];
+            document.getElementById('cbt-q-num').innerText = currentTestState.currentIndex + 1;
+            document.getElementById('cbt-question-text').innerText = q.q;
+            
+            const optsContainer = document.getElementById('cbt-options');
+            optsContainer.innerHTML = '';
+            
+            q.opts.forEach((opt, index) => {
+                optsContainer.innerHTML += `<label class="block p-3 border rounded-lg cursor-pointer hover:bg-green-50 transition"><input type="radio" name="cbt-answer" value="${index}" class="mr-3 text-primary">${opt}</label>`;
+            });
+
+            document.getElementById('btn-next-q').innerText = (currentTestState.currentIndex === 9) ? "Submit Test" : "Next Question";
+        }
+
+        function nextQuestion() {
+            const selected = document.querySelector('input[name="cbt-answer"]:checked');
+            if (!selected) return alert("Please select an answer!");
+
+            if (parseInt(selected.value) === currentTestState.questions[currentTestState.currentIndex].ans) {
+                currentTestState.score++;
+            }
+
+            currentTestState.currentIndex++;
+            if (currentTestState.currentIndex >= 10) finishTest();
+            else renderQuestion();
+        }
+
+        function endTestEarly() {
+            if(confirm("Are you sure you want to end the test? Unanswered questions will be scored as 0.")) finishTest();
+        }
+
+        function finishTest() {
+            currentUser.testHistory.push({ subject: currentTestState.subject, score: currentTestState.score, date: new Date().toISOString() });
+            const userIndex = users.findIndex(u => u.email === currentUser.email);
+            users[userIndex] = currentUser;
+            localStorage.setItem('annex_users', JSON.stringify(users));
+
+            document.getElementById('score-subject').innerText = currentTestState.subject;
+            document.getElementById('score-value').innerText = currentTestState.score;
+            
+            const msg = document.getElementById('score-message');
+            if(currentTestState.score >= 7) msg.innerText = "Excellent work! You have mastered this module.";
+            else if(currentTestState.score >= 5) msg.innerText = "Good job, but there is room for improvement.";
+            else msg.innerText = "You might want to study the material and try again.";
+
+            navigate('score');
+        }
+
+        window.onload = () => {
+            initCanvasAnimations(); updateNavbar();
+            if(currentUser) navigate('dashboard'); else navigate('landing');
+        };
+    </script>
+</body>
+</html>
+
